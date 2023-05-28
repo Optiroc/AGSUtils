@@ -10,7 +10,7 @@ EC = ec
 
 all: ags-uname ags-vadjust
 ags-uname: ags-uname.e defs.m uname.m
-ags-uname: ags-vadjust.e defs.m uname.m
+ags-vadjust: ags-vadjust.e defs.m uname.m
 
 .PHONY: clean
 clean:
