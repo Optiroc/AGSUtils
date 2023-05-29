@@ -1,7 +1,6 @@
 -> Tool that writes MiSTer video adjust settings
 
-OPT PREPROCESS
-OPT OSVERSION=37
+OPT OSVERSION=33,PREPROCESS,STRMERGE
 
 MODULE 'dos/dos'
 MODULE 'dos/rdargs'

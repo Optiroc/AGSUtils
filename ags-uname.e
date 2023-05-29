@@ -1,7 +1,6 @@
 -> Tool that detects the system type and prints the result to stdout
 
-OPT PREPROCESS
-OPT OSVERSION=33
+OPT OSVERSION=33,PREPROCESS,STRMERGE
 
 MODULE '*uname'
 

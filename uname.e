@@ -1,7 +1,6 @@
 -> Module for system type detection
 
-OPT MODULE
-OPT PREPROCESS
+OPT MODULE,PREPROCESS,STRMERGE
 
 MODULE 'expansion'
 MODULE '*defs'
