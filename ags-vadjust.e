@@ -80,7 +80,7 @@ PROC set(data: PTR TO CHAR, index, id, ntsc, laced, hshift, vshift, scale, sachs
 
     -> adjust for interlace
     IF laced
-        b := b - 1
+        b -= 1
     ENDIF
 
     -> negate right and bottom
@@ -91,11 +91,17 @@ PROC set(data: PTR TO CHAR, index, id, ntsc, laced, hshift, vshift, scale, sachs
     IF vshift <> 0
         IF t + vshift < 0 THEN vshift := -t
         IF b + vshift > 4095 THEN vshift := 4095 - b
-        t := t + vshift
-        b := b + vshift
+        t += vshift
+        b += vshift
     ENDIF
 
-    -> TODO: adjust horizontal shift
+    -> adjust horizontal shift
+    IF hshift <> 0
+        IF l + hshift < 0 THEN hshift := -l
+        IF r + hshift > 4095 THEN hshift := 4095 - r
+        l += hshift
+        r += hshift
+    ENDIF
 
     -> write values
     offset := Shl(index, 4)
