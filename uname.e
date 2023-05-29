@@ -1,5 +1,5 @@
 -> Module for system type detection
-OPT MODULE
+
 OPT MODULE
 OPT PREPROCESS
 

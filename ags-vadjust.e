@@ -121,10 +121,10 @@ PROC clear(data: PTR TO CHAR)
     ENDFOR
 ENDPROC
 
-PROC argparse(conf:PTR TO config) HANDLE
+PROC argparse(template: PTR TO CHAR, conf:PTR TO config) HANDLE
     DEF args: rdargs
     DEF argv[4]: ARRAY OF LONG
-    IF ((wbmessage = NIL) AND (args := ReadArgs(TEMPLATE, argv, NIL)))
+    IF ((wbmessage = NIL) AND (args := ReadArgs(template, argv, NIL)))
         conf.hshift := IF argv[0] THEN Long(argv[0]) ELSE 0
         conf.vshift := IF argv[1] THEN Long(argv[1]) ELSE 0
         conf.scale := IF argv[2] THEN Long(argv[2]) ELSE 0
@@ -140,11 +140,13 @@ ENDPROC
 PROC main() HANDLE
     DEF conf: config
     DEF data[VADJUST_SIZE]: ARRAY OF CHAR
+    DEF template: PTR TO CHAR
     DEF f = NIL
 
-    argparse(conf)
-    clear(data)
+    template := TEMPLATE
+    argparse(template, conf)
 
+    clear(data)
     set(data,  0, $000F25E4, TRUE, FALSE,  conf.hshift, conf.vshift, conf.scale, conf.sachs) -> "NTSC LowRes"
     set(data,  1, $000F15E4, TRUE, FALSE,  conf.hshift, conf.vshift, conf.scale, conf.sachs) -> "NTSC LowRes--"
     set(data,  2, $010F25E4, TRUE, FALSE,  conf.hshift, conf.vshift, conf.scale, conf.sachs) -> "NTSC HiRes"
@@ -174,6 +176,6 @@ PROC main() HANDLE
     IF Write(f, data, VADJUST_SIZE) <> VADJUST_SIZE THEN Raise(ERR_WRITE)
 EXCEPT DO
     IF f THEN Close(f)
-    IF exception = ERR_ARGS THEN PrintF('error: wrong parameters\nusage: \s\n', TEMPLATE)
+    IF exception = ERR_ARGS THEN PrintF('error: wrong parameters\nusage: \s\n', template)
     IF exception THEN RETURN 21
 ENDPROC 0
