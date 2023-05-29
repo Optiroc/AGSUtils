@@ -6,11 +6,10 @@ MODULE 'dos/dos'
 MODULE 'dos/rdargs'
 MODULE '*defs'
 
-->TODO: Destination path as parameter
 ->TODO: Pocket support
 
-#define MISTER_PATH 'MiSTer:vadjust.dat'
-#define TEMPLATE 'H=HSHIFT/N,V=VSHIFT/N,S=SCALE/N,JS/K/S'
+#define DEFAULT_OUTFILE 'MiSTer:Amiga_vadjust.dat'
+#define TEMPLATE 'H=HSHIFT/N,V=VSHIFT/N,S=SCALE/N,JS/K/S,O=OUTFILE'
 
 CONST VADJUST_SIZE = 1024
 
@@ -24,7 +23,20 @@ OBJECT config
     vshift: LONG
     scale: LONG
     sachs: LONG
+    outfile: LONG
 ENDOBJECT
+
+PROC init() OF config
+    self.hshift := 0
+    self.vshift := 0
+    self.scale := 0
+    self.sachs := FALSE
+    self.outfile := String(256)
+ENDPROC
+
+PROC end() OF config
+    DisposeLink(self.outfile)
+ENDPROC
 
 CONST BASE_L = 152
 CONST BASE_R = 76
@@ -128,12 +140,13 @@ ENDPROC
 
 PROC argparse(template: PTR TO CHAR, conf:PTR TO config) HANDLE
     DEF args: rdargs
-    DEF argv[4]: ARRAY OF LONG
+    DEF argv[5]: ARRAY OF LONG
     IF ((wbmessage = NIL) AND (args := ReadArgs(template, argv, NIL)))
         conf.hshift := IF argv[0] THEN Long(argv[0]) ELSE 0
         conf.vshift := IF argv[1] THEN Long(argv[1]) ELSE 0
         conf.scale := IF argv[2] THEN Long(argv[2]) ELSE 0
         conf.sachs := IF argv[3] THEN TRUE ELSE FALSE
+        IF argv[4] THEN StrCopy(conf.outfile, argv[4]) ELSE StrCopy(conf.outfile, DEFAULT_OUTFILE)
     ELSE
         Raise(ERR_ARGS)
     ENDIF
@@ -143,13 +156,12 @@ EXCEPT DO
 ENDPROC
 
 PROC main() HANDLE
-    DEF conf: config
+    DEF conf = NIL:PTR TO config
     DEF data[VADJUST_SIZE]: ARRAY OF CHAR
-    DEF template: PTR TO CHAR
     DEF f = NIL
 
-    template := TEMPLATE
-    argparse(template, conf)
+    NEW conf.init()
+    argparse(TEMPLATE, conf)
 
     clear(data)
     set(data,  0, $000F25E4, TRUE, FALSE,  conf.hshift, conf.vshift, conf.scale, conf.sachs) -> "NTSC LowRes"
@@ -177,10 +189,10 @@ PROC main() HANDLE
     set(data, 22, $0223D5E4, FALSE, TRUE,  conf.hshift, conf.vshift, conf.scale, conf.sachs) -> "PAL SuperHiRes Laced"
     set(data, 23, $0223C5E4, FALSE, TRUE,  conf.hshift, conf.vshift, conf.scale, conf.sachs) -> "PAL SuperHiRes Laced--"
 
-    IF (f := Open(MISTER_PATH, MODE_NEWFILE)) = NIL THEN Raise(ERR_OPEN)
+    IF (f := Open(conf.outfile, MODE_NEWFILE)) = NIL THEN Raise(ERR_OPEN)
     IF Write(f, data, VADJUST_SIZE) <> VADJUST_SIZE THEN Raise(ERR_WRITE)
 EXCEPT DO
     IF f THEN Close(f)
-    IF exception = ERR_ARGS THEN PrintF('error: wrong parameters\nusage: \s\n', template)
+    IF exception = ERR_ARGS THEN PrintF('error: wrong parameters\nusage: \s\n', TEMPLATE)
     IF exception THEN RETURN 21
 ENDPROC 0
