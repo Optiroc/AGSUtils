@@ -9,7 +9,7 @@ MODULE '*defs'
 ->TODO: Pocket support
 
 #define DEFAULT_OUTFILE 'MiSTer:Amiga_vadjust.dat'
-#define TEMPLATE 'H=HSHIFT/N,V=VSHIFT/N,S=SCALE/N,JS/K/S,O=OUTFILE'
+#define TEMPLATE 'H=HSHIFT/N,V=VSHIFT/N,S=SCALE/N,JS/S,O=OUTFILE'
 
 CONST VADJUST_SIZE = 1024
 
@@ -49,18 +49,17 @@ PROC set(data: PTR TO CHAR, index, id, ntsc, laced, hshift, vshift, scale, sachs
     DEF offset
     DEF l, r, t, b
 
-    -> base values
+    -> set base values
+    l := BASE_L
+    r := BASE_R
+
     IF ntsc
         scale := Bounds(scale, 5, 6)
         SELECT scale
         CASE 5
-            l := BASE_L
-            r := BASE_R
             t := 16
             b := 10
         CASE 6
-            l := BASE_L
-            r := BASE_R
             t := 16
             b := 46
         ENDSELECT
@@ -73,13 +72,9 @@ PROC set(data: PTR TO CHAR, index, id, ntsc, laced, hshift, vshift, scale, sachs
             t := 11
             b := 6
         CASE 5
-            l := BASE_L
-            r := BASE_R
             t := 11
             b := 60
         CASE 6
-            l := BASE_L
-            r := BASE_R
             t := 11
             b := 96
         ENDSELECT
@@ -193,6 +188,9 @@ PROC main() HANDLE
     IF Write(f, data, VADJUST_SIZE) <> VADJUST_SIZE THEN Raise(ERR_WRITE)
 EXCEPT DO
     IF f THEN Close(f)
-    IF exception = ERR_ARGS THEN PrintF('error: wrong parameters\nusage: \s\n', TEMPLATE)
+    END conf
+    IF exception = ERR_ARGS THEN PrintF('error: invalid arguments\nusage: \s\n', TEMPLATE)
+    IF exception = ERR_OPEN THEN PrintF('error: failed to open file for writing\n')
+    IF exception = ERR_WRITE THEN PrintF('error: failed to write file\n')
     IF exception THEN RETURN 21
 ENDPROC 0
