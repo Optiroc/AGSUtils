@@ -1,6 +1,8 @@
 -> Tool that writes MiSTer video adjust settings
 
-OPT OSVERSION=33,PREPROCESS,STRMERGE
+OPT OSVERSION=37
+OPT PREPROCESS
+->OPT STRMERGE
 
 MODULE 'dos/dos'
 MODULE 'dos/rdargs'
@@ -87,7 +89,7 @@ PROC set(data: PTR TO CHAR, index, id, ntsc, laced, hshift, vshift, scale, sachs
 
     -> adjust for interlace
     IF laced
-        b -= 1
+        b := b + 1
     ENDIF
 
     -> negate right and bottom
@@ -98,16 +100,16 @@ PROC set(data: PTR TO CHAR, index, id, ntsc, laced, hshift, vshift, scale, sachs
     IF vshift <> 0
         IF t + vshift < 0 THEN vshift := -t
         IF b + vshift > 4095 THEN vshift := 4095 - b
-        t += vshift
-        b += vshift
+        t := t + vshift
+        b := b + vshift
     ENDIF
 
     -> adjust horizontal shift
     IF hshift <> 0
         IF l + hshift < 0 THEN hshift := -l
         IF r + hshift > 4095 THEN hshift := 4095 - r
-        l += hshift
-        r += hshift
+        l := l + hshift
+        r := r + hshift
     ENDIF
 
     -> write values
@@ -192,5 +194,5 @@ EXCEPT DO
     IF exception = ERR_ARGS THEN PrintF('error: invalid arguments\nusage: \s\n', TEMPLATE)
     IF exception = ERR_OPEN THEN PrintF('error: failed to open file for writing\n')
     IF exception = ERR_WRITE THEN PrintF('error: failed to write file\n')
-    IF exception THEN RETURN 21
+    IF exception THEN RETURN 1
 ENDPROC 0

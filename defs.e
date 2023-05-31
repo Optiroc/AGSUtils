@@ -1,4 +1,6 @@
-OPT MODULE,EXPORT,PREPROCESS
+OPT MODULE
+OPT EXPORT
+OPT PREPROCESS
 
 #define lb(val) (val AND $000000ff)
 #define hb(val) Shr(val AND $0000ff00, 8)
