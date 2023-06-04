@@ -8,9 +8,10 @@ EC = EC
 % : %.e
 	$(EC) $< $(ECFLAGS)
 
-all: ags-uname ags-vadjust
+all: ags-uname ags-vadjust ags-nop
 ags-uname: ags-uname.e defs.m uname.m
 ags-vadjust: ags-vadjust.e defs.m uname.m
+ags-nop: ags-nop.e
 
 .PHONY: clean
 clean:
