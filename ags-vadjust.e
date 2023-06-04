@@ -192,7 +192,7 @@ EXCEPT DO
     IF f THEN Close(f)
     END conf
     IF exception = ERR_ARGS THEN PrintF('error: invalid arguments\nusage: \s\n', TEMPLATE)
-    IF exception = ERR_OPEN THEN PrintF('error: failed to open file for writing\n')
-    IF exception = ERR_WRITE THEN PrintF('error: failed to write file\n')
+    ->IF exception = ERR_OPEN THEN PrintF('error: failed to open file for writing\n')
+    ->IF exception = ERR_WRITE THEN PrintF('error: failed to write file\n')
     IF exception THEN RETURN 1
 ENDPROC 0
